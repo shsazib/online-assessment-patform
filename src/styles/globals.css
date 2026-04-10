@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+/* Custom color variables */
+:root {
+  --color-bg-primary: #f9fafb;        /* Primary background */
+  --color-bg-secondary: #130B2C;      /* Secondary background */
+  --color-text-primary: #334155;      /* Main text color */
+  --color-text-secondary: #64748B;    /* Secondary text color */
+  --color-primary: #6633FF;           /* Brand primary color */
+  --color-border-primary: #E5E7EB;    /* primary border color */
+}
+
+/* Extend Tailwind theme */
+@theme inline {
+  --color-bg-primary: var(--color-bg-primary);
+  --color-bg-secondary: var(--color-bg-secondary);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-primary: var(--color-primary);
+  --color-border-primary: var(--color-border-primary);
+
+  /* Set Inter as default sans font */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Global body styles */
+body {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+.btn-primary{
+  @apply text-white font-semibold px-6 py-3 rounded-xl cursor-pointer transition duration-200;
+  background-color: var(--color-primary);
+}
+.btn-primary:hover{
+  background-color: #6633ffe2;
+}
+
+.btn-secondary{
+  @apply bg-white text-primary font-semibold text-sm px-6 py-2.5 rounded-xl cursor-pointer transition duration-200 border border-primary;
+}
+.btn-secondary:hover{
+  @apply bg-primary text-white;
+}
+
+.btn-tertiary{
+  @apply bg-white font-semibold text-sm px-6 py-2.5 rounded-xl cursor-pointer transition duration-200 border border-border-primary;
+}
+.btn-tertiary:hover{
+  @apply bg-gray-50;
+}
