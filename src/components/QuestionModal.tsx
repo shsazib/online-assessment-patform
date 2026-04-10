@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 
 interface Option {
   id: string;
@@ -26,6 +28,204 @@ interface QuestionModalProps {
   onClose: () => void;
 }
 
+// Reusable toolbar + editor
+const RichEditor = ({
+  content,
+  onChange,
+  placeholder,
+}: {
+  content: string;
+  onChange: (val: string) => void;
+  placeholder?: string;
+}) => {
+const editor = useEditor({
+  extensions: [StarterKit],
+  content,
+  immediatelyRender: false,
+  onUpdate: ({ editor }) => {
+    onChange(editor.getHTML());
+  },
+  editorProps: {
+    attributes: {
+      class:
+        "min-h-[70px] p-3 text-sm text-gray-700 focus:outline-none prose prose-sm max-w-none",
+    },
+  },
+});
+
+  if (!editor) return null;
+
+  return (
+    <div className="border border-gray-200 rounded-xl overflow-hidden">
+      {/* Toolbar */}
+      <div className="flex items-center gap-1 px-3 py-2 border-b border-gray-200 bg-gray-50 flex-wrap">
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().undo().run()}
+          disabled={!editor.can().undo()}
+          className="p-1 rounded text-gray-500 hover:text-gray-700 hover:bg-gray-200 disabled:opacity-30 transition"
+          title="Undo"
+        >
+          <svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+            <path d="M9 14L4 9l5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M4 9h10.5a4.5 4.5 0 0 1 0 9H11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().redo().run()}
+          disabled={!editor.can().redo()}
+          className="p-1 rounded text-gray-500 hover:text-gray-700 hover:bg-gray-200 disabled:opacity-30 transition"
+          title="Redo"
+        >
+          <svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+            <path d="M15 14l5-5-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M20 9H9.5a4.5 4.5 0 0 0 0 9H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+
+        <div className="w-px h-4 bg-gray-200 mx-1" />
+
+        {/* Heading dropdown */}
+        <select
+          onChange={(e) => {
+            const val = e.target.value;
+            if (val === "normal") {
+              editor.chain().focus().setParagraph().run();
+            } else {
+              editor.chain().focus().setHeading({ level: Number(val) as 1 | 2 | 3 }).run();
+            }
+          }}
+          value={
+            editor.isActive("heading", { level: 1 })
+              ? "1"
+              : editor.isActive("heading", { level: 2 })
+              ? "2"
+              : editor.isActive("heading", { level: 3 })
+              ? "3"
+              : "normal"
+          }
+          className="text-xs text-gray-500 border border-gray-200 rounded px-2 py-0.5 focus:outline-none bg-white"
+        >
+          <option value="normal">Normal text</option>
+          <option value="1">Heading 1</option>
+          <option value="2">Heading 2</option>
+          <option value="3">Heading 3</option>
+        </select>
+
+        {/* List dropdown */}
+        <select
+          onChange={(e) => {
+            const val = e.target.value;
+            if (val === "bullet") editor.chain().focus().toggleBulletList().run();
+            else if (val === "ordered") editor.chain().focus().toggleOrderedList().run();
+            else editor.chain().focus().setParagraph().run();
+          }}
+          value={
+            editor.isActive("bulletList")
+              ? "bullet"
+              : editor.isActive("orderedList")
+              ? "ordered"
+              : "none"
+          }
+          className="text-xs text-gray-500 border border-gray-200 rounded px-2 py-0.5 focus:outline-none bg-white"
+        >
+          <option value="none">≡ List</option>
+          <option value="bullet">• Bullet</option>
+          <option value="ordered">1. Ordered</option>
+        </select>
+
+        <div className="w-px h-4 bg-gray-200 mx-1" />
+
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          className={`px-2 py-0.5 rounded text-sm font-bold transition ${
+            editor.isActive("bold")
+              ? "bg-gray-200 text-gray-900"
+              : "text-gray-500 hover:bg-gray-200 hover:text-gray-700"
+          }`}
+        >
+          B
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          className={`px-2 py-0.5 rounded text-sm italic transition ${
+            editor.isActive("italic")
+              ? "bg-gray-200 text-gray-900"
+              : "text-gray-500 hover:bg-gray-200 hover:text-gray-700"
+          }`}
+        >
+          I
+        </button>
+      </div>
+
+      {/* Editor area */}
+      <EditorContent editor={editor} />
+    </div>
+  );
+};
+
+// Option editor with its own tiptap instance
+const OptionEditor = ({
+  option,
+  questionType,
+  onTextChange,
+  onCorrectChange,
+  onRemove,
+  canRemove,
+}: {
+  option: Option;
+  questionType: "MCQ" | "Checkbox";
+  onTextChange: (val: string) => void;
+  onCorrectChange: (val: boolean) => void;
+  onRemove: () => void;
+  canRemove: boolean;
+}) => {
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-1">
+        <span className="w-7 h-7 rounded-full border-2 border-gray-300 flex items-center justify-center text-xs font-semibold text-gray-600 shrink-0">
+          {option.label}
+        </span>
+        <button
+          type="button"
+          onClick={() => onCorrectChange(!option.isCorrect)}
+          className={`flex items-center gap-1.5 text-xs px-2 py-1 rounded-full border transition ${
+            option.isCorrect
+              ? "border-green-400 text-green-600 bg-green-50"
+              : "border-gray-200 text-gray-400 hover:border-gray-300"
+          }`}
+        >
+          <div
+            className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${
+              option.isCorrect ? "border-green-500" : "border-gray-300"
+            }`}
+          >
+            {option.isCorrect && (
+              <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+            )}
+          </div>
+          Set as correct answer
+        </button>
+        {canRemove && (
+          <button
+            type="button"
+            onClick={onRemove}
+            className="ml-auto text-gray-300 hover:text-red-400 transition p-1"
+          >
+            <svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+              <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        )}
+      </div>
+      <RichEditor content={option.text} onChange={onTextChange} placeholder="Type option text here..." />
+    </div>
+  );
+};
+
 const QuestionModal: React.FC<QuestionModalProps> = ({
   question,
   onSave,
@@ -37,283 +237,227 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
   const [questionText, setQuestionText] = useState(question?.text || "");
   const [points, setPoints] = useState(question?.points || 1);
   const [negativeMarking, setNegativeMarking] = useState(question?.negativeMarking || 0);
+  const [answerPlaceholder, setAnswerPlaceholder] = useState(
+    question?.answerPlaceholder || ""
+  );
   const [options, setOptions] = useState<Option[]>(
-    question?.options || [
-      { id: "opt_a", label: "A", text: "", isCorrect: false },
-      { id: "opt_b", label: "B", text: "", isCorrect: false },
-      { id: "opt_c", label: "C", text: "", isCorrect: false },
-      { id: "opt_d", label: "D", text: "", isCorrect: false },
-    ]
+    question?.options?.length
+      ? question.options
+      : [
+          { id: "opt_a", label: "A", text: "", isCorrect: false },
+          { id: "opt_b", label: "B", text: "", isCorrect: false },
+        ]
   );
 
-  const handleOptionChange = (id: string, field: string, value: any) => {
-    if (field === "isCorrect" && value && questionType === "MCQ") {
-      // For MCQ, unselect all other options when selecting one
-      setOptions(
-        options.map((opt) =>
-          opt.id === id ? { ...opt, [field]: true } : { ...opt, isCorrect: false }
+  const handleOptionTextChange = (id: string, val: string) => {
+    setOptions((prev) =>
+      prev.map((opt) => (opt.id === id ? { ...opt, text: val } : opt))
+    );
+  };
+
+  const handleOptionCorrectChange = (id: string, val: boolean) => {
+    if (questionType === "MCQ") {
+      setOptions((prev) =>
+        prev.map((opt) =>
+          opt.id === id ? { ...opt, isCorrect: true } : { ...opt, isCorrect: false }
         )
       );
     } else {
-      setOptions(
-        options.map((opt) =>
-          opt.id === id ? { ...opt, [field]: value } : opt
-        )
+      setOptions((prev) =>
+        prev.map((opt) => (opt.id === id ? { ...opt, isCorrect: val } : opt))
       );
     }
   };
 
   const handleAddOption = () => {
     const newLabel = String.fromCharCode(65 + options.length);
-    setOptions([
-      ...options,
-      { id: `opt_${newLabel.toLowerCase()}`, label: newLabel, text: "", isCorrect: false },
+    setOptions((prev) => [
+      ...prev,
+      { id: `opt_${Date.now()}`, label: newLabel, text: "", isCorrect: false },
     ]);
   };
 
   const handleRemoveOption = (id: string) => {
-    if (options.length > 2) {
-      setOptions(options.filter((opt) => opt.id !== id));
-    }
+    setOptions((prev) => prev.filter((opt) => opt.id !== id));
   };
 
-  const handleSave = () => {
-    const newQuestion: Question = {
-      id: question?.id || `q_${Date.now()}`,
-      number: question?.number || 1,
-      type: questionType,
-      points,
-      negativeMarking: negativeMarking > 0 ? negativeMarking : undefined,
-      text: questionText,
-      options: questionType === "Text" ? [] : options,
-      answerPlaceholder:
-        questionType === "Text" ? "Write your answer here..." : undefined,
-    };
-    onSave(newQuestion);
+ const handleSave = () => {
+  // Validation
+  if (!questionText || questionText === "<p></p>") {
+    alert("Please enter question text");
+    return;
+  }
+
+  if (questionType !== "Text") {
+    const hasCorrectAnswer = options.some((opt) => opt.isCorrect);
+    if (!hasCorrectAnswer) {
+      alert("Please set at least one correct answer");
+      return;
+    }
+
+    const hasEmptyOption = options.some(
+      (opt) => !opt.text || opt.text === "<p></p>"
+    );
+    if (hasEmptyOption) {
+      alert("Please fill in all option texts");
+      return;
+    }
+  }
+
+  const newQuestion: Question = {
+    id: question?.id || `q_${Date.now()}`,
+    number: question?.number || 1,
+    type: questionType,
+    points,
+    negativeMarking: negativeMarking > 0 ? negativeMarking : undefined,
+    text: questionText,
+    options: questionType === "Text" ? [] : options,
+    answerPlaceholder:
+      questionType === "Text"
+        ? answerPlaceholder || "Write your answer here..."
+        : undefined,
   };
+  onSave(newQuestion);
+  onClose();
+};
 
   return (
-    <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-screen overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+
+        {/* Header */}
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
+          <h2 className="text-base font-semibold text-gray-900">
             {question ? "Edit Question" : "Add Question"}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <svg
-              width={24}
-              height={24}
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M18 6L6 18M6 6l12 12"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition">
+            <svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
         </div>
 
         <div className="p-6 space-y-5">
-          {/* Question Type Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Question Type <span className="text-red-500">*</span>
-            </label>
-            <div className="grid grid-cols-3 gap-3">
-              {["MCQ", "Checkbox", "Text"].map((type) => (
-                <button
-                  key={type}
-                  onClick={() => {
-                    setQuestionType(type as "MCQ" | "Checkbox" | "Text");
-                    if (type === "Text") {
+
+          {/* Top row — score, type, negative */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1.5">
+              <span className="w-5 h-5 rounded-full bg-gray-400 text-white text-xs flex items-center justify-center font-semibold">
+                {question?.number || "1"}
+              </span>
+              <span className="text-sm font-medium text-gray-700">
+                Question {question?.number || "1"}
+              </span>
+            </div>
+
+            <div className="ml-auto flex items-center gap-3">
+              {/* Score */}
+              <div className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-1.5">
+                <span className="text-sm text-gray-500">Score:</span>
+                <input
+                  type="number"
+                  value={points}
+                  onChange={(e) => setPoints(Number(e.target.value))}
+                  min="1"
+                  className="w-12 text-sm font-medium text-gray-800 focus:outline-none text-center"
+                />
+              </div>
+
+              {/* Type */}
+              <div className="relative">
+                <select
+                  value={questionType}
+                  onChange={(e) => {
+                    const val = e.target.value as "MCQ" | "Checkbox" | "Text";
+                    setQuestionType(val);
+                    if (val === "Text") {
                       setOptions([]);
                     } else if (options.length === 0) {
                       setOptions([
-                        {
-                          id: "opt_a",
-                          label: "A",
-                          text: "",
-                          isCorrect: false,
-                        },
-                        {
-                          id: "opt_b",
-                          label: "B",
-                          text: "",
-                          isCorrect: false,
-                        },
-                        {
-                          id: "opt_c",
-                          label: "C",
-                          text: "",
-                          isCorrect: false,
-                        },
-                        {
-                          id: "opt_d",
-                          label: "D",
-                          text: "",
-                          isCorrect: false,
-                        },
+                        { id: "opt_a", label: "A", text: "", isCorrect: false },
+                        { id: "opt_b", label: "B", text: "", isCorrect: false },
                       ]);
                     }
                   }}
-                  className={`py-2 px-4 rounded-lg font-medium text-sm transition ${
-                    questionType === type
-                      ? "bg-primary text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                  className="appearance-none border border-gray-200 rounded-lg pl-3 pr-8 py-1.5 text-sm font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer bg-white"
                 >
-                  {type}
-                </button>
-              ))}
-            </div>
-          </div>
+                  <option value="MCQ">Radio</option>
+                  <option value="Checkbox">Checkbox</option>
+                  <option value="Text">Text</option>
+                </select>
+                <svg className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" width={12} height={12} viewBox="0 0 24 24" fill="none">
+                  <path d="M6 9l6 6 6-6" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
 
-          {/* Question Text */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Question Text <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              value={questionText}
-              onChange={(e) => setQuestionText(e.target.value)}
-              placeholder="Enter your question here..."
-              className="w-full border border-border-primary rounded-lg p-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent transition resize-none min-h-24"
-            />
-          </div>
-
-          {/* Points and Negative Marking */}
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Points <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                value={points}
-                onChange={(e) => setPoints(Number(e.target.value))}
-                min="1"
-                className="w-full border border-border-primary rounded-lg p-3 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent transition"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Negative Marking <span className="text-gray-400 text-xs">(Optional)</span>
-              </label>
-              <input
-                type="number"
-                value={negativeMarking}
-                onChange={(e) => setNegativeMarking(Number(e.target.value))}
-                min="0"
-                step="0.5"
-                placeholder="0"
-                className="w-full border border-border-primary rounded-lg p-3 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent transition"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Correct Answer
-              </label>
-              <div className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-500 bg-gray-50">
-                {questionType === "MCQ"
-                  ? "1 Option"
-                  : "Multiple"}
+              {/* Negative marking */}
+              <div className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-1.5">
+                <span className="text-sm text-gray-500">-ve:</span>
+                <input
+                  type="number"
+                  value={negativeMarking}
+                  onChange={(e) => setNegativeMarking(Number(e.target.value))}
+                  min="0"
+                  step="0.5"
+                  className="w-12 text-sm font-medium text-gray-800 focus:outline-none text-center"
+                />
               </div>
             </div>
           </div>
 
-          {/* Options */}
+          {/* Question rich editor */}
+          <RichEditor
+            content={questionText}
+            onChange={setQuestionText}
+            placeholder="Type your question here..."
+          />
+
+          {/* MCQ / Checkbox options */}
           {questionType !== "Text" && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Options <span className="text-red-500">*</span>
-              </label>
-              <div className="space-y-3">
-                {options.map((option, idx) => (
-                  <div key={option.id} className="flex items-start gap-3">
-                    <div className="flex items-center gap-2 pt-3">
-                      <input
-                        type={
-                          questionType === "MCQ" ? "radio" : "checkbox"
-                        }
-                        name="correct"
-                        checked={option.isCorrect}
-                        onChange={(e) =>
-                          handleOptionChange(
-                            option.id,
-                            "isCorrect",
-                            e.target.checked
-                          )
-                        }
-                        className="w-4 h-4"
-                      />
-                      <span className="text-sm font-medium text-gray-600 w-6">
-                        {option.label}.
-                      </span>
-                    </div>
-                    <input
-                      type="text"
-                      value={option.text}
-                      onChange={(e) =>
-                        handleOptionChange(option.id, "text", e.target.value)
-                      }
-                      placeholder="Enter option text"
-                      className="flex-1 border border-border-primary rounded-lg p-2.5 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent transition"
-                    />
-                    {options.length > 2 && (
-                      <button
-                        onClick={() => handleRemoveOption(option.id)}
-                        className="p-2 hover:bg-red-50 rounded-lg transition text-red-600 mt-0.5"
-                      >
-                        <svg
-                          width={18}
-                          height={18}
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M6 12h12"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
+            <div className="space-y-4">
+              {options.map((option) => (
+                <OptionEditor
+                  key={option.id}
+                  option={option}
+                  questionType={questionType}
+                  onTextChange={(val) => handleOptionTextChange(option.id, val)}
+                  onCorrectChange={(val) => handleOptionCorrectChange(option.id, val)}
+                  onRemove={() => handleRemoveOption(option.id)}
+                  canRemove={options.length > 2}
+                />
+              ))}
               <button
+                type="button"
                 onClick={handleAddOption}
-                className="mt-3 text-sm text-primary hover:text-primary-dark font-medium"
+                className="w-full py-2.5 border-2 border-dashed border-gray-200 rounded-xl text-sm text-gray-400 hover:border-primary hover:text-primary transition font-medium"
               >
-                + Another option
+                + Add Option
               </button>
+            </div>
+          )}
+
+          {/* Text type — answer field is also rich editor */}
+          {questionType === "Text" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Sample Answer{" "}
+                <span className="text-gray-400 text-xs">(Optional)</span>
+              </label>
+              <RichEditor
+                content={answerPlaceholder}
+                onChange={setAnswerPlaceholder}
+                placeholder="Write a sample answer here..."
+              />
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 p-6 flex items-center justify-between">
-          <button
-            onClick={onClose}
-            className="btn-tertiary text-sm py-2.5"
-          >
+        <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex items-center justify-between">
+          <button onClick={onClose} className="btn-tertiary text-sm py-2.5">
             Cancel
           </button>
-          <button
-            onClick={handleSave}
-            className="btn-primary text-sm py-2.5"
-          >
+          <button onClick={handleSave} className="btn-primary text-sm py-2.5">
             Save & Add Another
           </button>
         </div>

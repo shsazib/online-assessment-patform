@@ -26,9 +26,7 @@ interface QuestionsManagementProps {
   examId: string;
 }
 
-const QuestionsManagement: React.FC<QuestionsManagementProps> = ({
-  examId,
-}) => {
+const QuestionsManagement: React.FC<QuestionsManagementProps> = ({ examId }) => {
   const router = useRouter();
   const { exam, loading } = useExamData(examId);
   const { saveExamToStorage } = useExamStore();
@@ -53,47 +51,47 @@ const QuestionsManagement: React.FC<QuestionsManagementProps> = ({
   };
 
   const handleDeleteQuestion = (id: string) => {
-    setQuestions(questions.filter((q) => q.id !== id));
+    setQuestions((prev) => prev.filter((q) => q.id !== id));
   };
 
   const handleSaveQuestion = (question: Question) => {
-  let updatedQuestions;
-  if (editingQuestion) {
-    updatedQuestions = questions.map((q) =>
-      q.id === question.id ? question : q,
-    );
-  } else {
-    updatedQuestions = [...questions, { ...question, number: questions.length + 1 }];
-  }
-  setQuestions(updatedQuestions);
+    let updatedQuestions;
+    if (editingQuestion) {
+      updatedQuestions = questions.map((q) =>
+        q.id === question.id ? question : q
+      );
+    } else {
+      updatedQuestions = [
+        ...questions,
+        { ...question, number: questions.length + 1 },
+      ];
+    }
+    setQuestions(updatedQuestions);
 
-  if (exam) {
-    saveExamToStorage({ ...exam, questions: updatedQuestions });
-  }
+    if (exam) {
+      saveExamToStorage({ ...exam, questions: updatedQuestions });
+    }
 
-  setIsModalOpen(false);
-  setEditingQuestion(null);
-};
+    setIsModalOpen(false);
+    setEditingQuestion(null);
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-6">
         <div className="space-y-4">
-          {questions.map((question, index) => (
+          {questions.map((question) => (
             <div key={question.id} className="bg-white rounded-2xl p-6">
-              <div className="flex items-start justify-between border-b border-border-primary">
-                <div className="flex-1 flex items-center justify-between gap-3 flex-wrap mb-4">
-                  <span className="font-semibold">
-                    Question {question.number}
+              {/* Question header */}
+              <div className="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-border-primary">
+                <span className="font-semibold">Question {question.number}</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm text-text-secondary px-2 py-1 rounded-xl border border-border-primary">
+                    {question.type}
                   </span>
-                  <div className="flex gap-2">
-                    <span className="text-sm text-text-secondary px-2 py-1 rounded-xl border border-border-primary">
-                      {question.type}
-                    </span>
-                    <span className="text-sm text-text-secondary px-2 py-1 rounded-xl border border-border-primary">
-                      {question.points} pt
-                    </span>
-                  </div>
+                  <span className="text-sm text-text-secondary px-2 py-1 rounded-xl border border-border-primary">
+                    {question.points} pt
+                  </span>
                   {question.negativeMarking && question.negativeMarking > 0 && (
                     <span className="text-xs bg-red-50 text-red-600 px-2 py-1 rounded">
                       -{question.negativeMarking} pts (wrong)
@@ -102,7 +100,13 @@ const QuestionsManagement: React.FC<QuestionsManagementProps> = ({
                 </div>
               </div>
 
-              <p className="font-semibold py-6 text-black">{question.text}</p>
+              {/* Question text */}
+              <div
+                className="font-semibold py-6 text-black prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: question.text }}
+              />
+
+              {/* Options */}
               {question.type !== "Text" && (
                 <div className="space-y-2">
                   {question.options.map((option) => (
@@ -112,9 +116,15 @@ const QuestionsManagement: React.FC<QuestionsManagementProps> = ({
                         option.isCorrect ? "bg-gray-100" : ""
                       }`}
                     >
-                      <span>
-                        {option.label}. {option.text}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-600 shrink-0">
+                          {option.label}.
+                        </span>
+                        <div
+                          className="text-sm prose prose-sm max-w-none"
+                          dangerouslySetInnerHTML={{ __html: option.text }}
+                        />
+                      </div>
                       {option.isCorrect && (
                         <svg
                           width={24}
@@ -122,6 +132,7 @@ const QuestionsManagement: React.FC<QuestionsManagementProps> = ({
                           viewBox="0 0 24 24"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
+                          className="shrink-0"
                         >
                           <path
                             fillRule="evenodd"
@@ -136,10 +147,19 @@ const QuestionsManagement: React.FC<QuestionsManagementProps> = ({
                 </div>
               )}
 
+              {/* Text type answer placeholder */}
+              {question.type === "Text" && question.answerPlaceholder && (
+                <div
+                  className="text-sm text-gray-400 italic border border-dashed border-gray-200 rounded-lg p-3 prose prose-sm max-w-none"
+                  dangerouslySetInnerHTML={{ __html: question.answerPlaceholder }}
+                />
+              )}
+
+              {/* Actions */}
               <div className="flex items-center justify-between gap-2 pt-4 mt-4 border-t border-border-primary">
                 <button
                   onClick={() => handleEditQuestion(question)}
-                  className="text-primary hover:text-primary/80 transition cursor-pointer "
+                  className="text-primary hover:text-primary/80 transition cursor-pointer"
                 >
                   Edit
                 </button>
@@ -173,7 +193,14 @@ const QuestionsManagement: React.FC<QuestionsManagementProps> = ({
         />
       )}
 
-      
+      <div className="bg-white flex items-center p-6 rounded-2xl">
+        <button
+          onClick={() => router.back()}
+          className="btn-tertiary text-sm py-2.5"
+        >
+          Back
+        </button>
+      </div>
     </div>
   );
 };
