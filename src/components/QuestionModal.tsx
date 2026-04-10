@@ -17,6 +17,7 @@ interface Question {
   text: string;
   options: Option[];
   answerPlaceholder?: string;
+  negativeMarking?: number;
 }
 
 interface QuestionModalProps {
