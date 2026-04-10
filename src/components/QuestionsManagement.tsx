@@ -57,33 +57,23 @@ const QuestionsManagement: React.FC<QuestionsManagementProps> = ({
   };
 
   const handleSaveQuestion = (question: Question) => {
-    let updatedQuestions;
-    if (editingQuestion) {
-      updatedQuestions = questions.map((q) =>
-        q.id === question.id ? question : q,
-      );
-    } else {
-      updatedQuestions = [...questions, question];
-    }
-    setQuestions(updatedQuestions);
-    setIsModalOpen(false);
-    setEditingQuestion(null);
-  };
+  let updatedQuestions;
+  if (editingQuestion) {
+    updatedQuestions = questions.map((q) =>
+      q.id === question.id ? question : q,
+    );
+  } else {
+    updatedQuestions = [...questions, { ...question, number: questions.length + 1 }];
+  }
+  setQuestions(updatedQuestions);
 
-  const handleCompleteExam = () => {
-    if (!exam) return;
+  if (exam) {
+    saveExamToStorage({ ...exam, questions: updatedQuestions });
+  }
 
-    // Update exam with questions and save to storage
-    const updatedExam = {
-      ...exam,
-      questions,
-    };
-
-    saveExamToStorage(updatedExam);
-
-    // Redirect to dashboard
-    router.push("/employer/dashboard");
-  };
+  setIsModalOpen(false);
+  setEditingQuestion(null);
+};
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -183,20 +173,7 @@ const QuestionsManagement: React.FC<QuestionsManagementProps> = ({
         />
       )}
 
-      <div className="bg-white flex items-center justify-between p-6 rounded-2xl">
-        <button
-          onClick={() => router.back()}
-          className="btn-tertiary text-sm py-2.5"
-        >
-          Back
-        </button>
-        <button
-          onClick={handleCompleteExam}
-          className="btn-primary text-sm py-2.5"
-        >
-          Complete & Go to Dashboard
-        </button>
-      </div>
+      
     </div>
   );
 };
