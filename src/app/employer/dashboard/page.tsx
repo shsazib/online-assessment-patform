@@ -41,7 +41,7 @@ export default function EmployerDashboard() {
               Online Tests
             </h1>
 
-            <div className="flex-1 max-w-md relative shadow">
+            <div className="flex-1 max-w-md relative shadow rounded-lg">
               <input
                 type="text"
                 placeholder="Search by exam title"

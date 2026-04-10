@@ -30,46 +30,45 @@ const ExamDetailPage = () => {
 
             <div className="flex justify-between">
               <div className="flex-1 flex items-center gap-3">
-                <button
-                  onClick={() => setCurrentStep('basic')}
-                  className="flex items-center gap-2 group"
-                >
+                {/* Step 1 - Basic Info */}
+                <div className="flex items-center gap-2">
                   <span className={`w-6 h-6 rounded-full text-xs flex items-center justify-center font-semibold transition ${
-                    currentStep === 'basic'
+                    currentStep === 'basic' || currentStep === 'questions'
                       ? 'bg-primary text-white'
-                      : 'bg-gray-200 text-gray-700 group-hover:bg-gray-300'
+                      : 'bg-gray-200 text-gray-700'
                   }`}>
                     1
                   </span>
                   <span className={`text-sm font-medium transition ${
-                    currentStep === 'basic'
+                    currentStep === 'basic' || currentStep === 'questions'
                       ? 'text-primary'
-                      : 'text-gray-700 group-hover:text-gray-900'
+                      : 'text-gray-700'
                   }`}>
                     Basic Info
                   </span>
-                </button>
+                </div>
+
                 <div className="flex-1 h-px bg-gray-200 max-w-20"></div>
-                <button
-                  onClick={() => setCurrentStep('questions')}
-                  className="flex items-center gap-2 group"
-                >
+
+                {/* Step 2 - Questions */}
+                <div className="flex items-center gap-2">
                   <span className={`w-6 h-6 rounded-full text-xs flex items-center justify-center font-semibold transition ${
                     currentStep === 'questions'
                       ? 'bg-primary text-white'
-                      : 'bg-gray-200 text-gray-700 group-hover:bg-gray-300'
+                      : 'bg-gray-200 text-gray-700'
                   }`}>
                     2
                   </span>
                   <span className={`text-sm transition ${
                     currentStep === 'questions'
                       ? 'text-primary'
-                      : 'text-gray-700 group-hover:text-gray-900'
+                      : 'text-gray-700'
                   }`}>
-                    Questions
+                    Question Sets
                   </span>
-                </button>
+                </div>
               </div>
+
               <Link href="../dashboard" className="btn-tertiary">
                 Back to Dashboard
               </Link>
