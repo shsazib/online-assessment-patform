@@ -1,19 +1,48 @@
 "use client";
 
 import { useAuthStore } from "@/store/useAuthStore";
-import Link from "next/link";
+import { useExamStore } from "@/store/useExamStore";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { exams } from "@/data/dummyData";
 
 export default function CandidateDashboard() {
   const { user, isAuthenticated, hasHydrated } = useAuthStore();
+  const { startCandidateSession, setCurrentExam, loadExamsFromStorage } = useExamStore();
   const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [allExams, setAllExams] = useState<any[]>(exams);
 
   useEffect(() => {
     if (hasHydrated && (!isAuthenticated || user?.role !== "candidate")) {
       router.push("/login");
     }
   }, [hasHydrated, isAuthenticated, user, router]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const storedExams = loadExamsFromStorage();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const combined: any[] = [...exams];
+
+        storedExams.forEach((storedExam) => {
+          if (!combined.find((e) => e.id === storedExam.id)) {
+            combined.push(storedExam);
+          } else {
+            const index = combined.findIndex((e) => e.id === storedExam.id);
+            combined[index] = storedExam;
+          }
+        });
+
+        setAllExams(combined);
+      } catch (error) {
+        console.error("Failed to load exams from localStorage:", error);
+        setAllExams(exams);
+      }
+    }
+  }, [loadExamsFromStorage]);
 
   if (!hasHydrated) {
     return (
@@ -27,18 +56,32 @@ export default function CandidateDashboard() {
     return null;
   }
 
+  const filteredExams = allExams.filter((exam) =>
+    exam.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleStartExam = (examId: string) => {
+    const exam = allExams.find((e) => e.id === examId);
+    if (exam) {
+      setCurrentExam(exam);
+      startCandidateSession(examId, exam);
+      router.push(`/candidate/exam-screen/${examId}`);
+    }
+  };
+
   return (
     <>
       <section className="min-h-screen px-4">
         <div className="container mx-auto my-14">
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
             <h1 className="text-2xl font-semibold">Online Tests</h1>
 
             <div className="flex-1 max-w-md relative shadow rounded-lg">
               <input
                 type="text"
                 placeholder="Search by exam title"
-                value=""
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full border border-violet-400 rounded-lg py-4 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-primary/10 p-2 cursor-pointer">
@@ -114,11 +157,14 @@ export default function CandidateDashboard() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Link href="">
-              <div className="bg-white p-8 border border-border-primary rounded-2xl hover:shadow-lg transition cursor-pointer h-full">
+            {filteredExams.map((exam) => (
+              <div
+                key={exam.id}
+                className="bg-white p-8 border border-border-primary rounded-2xl hover:shadow-lg transition cursor-pointer h-full"
+              >
                 <div className="flex items-start justify-between mb-4">
                   <h2 className="text-xl font-semibold text-gray-800 flex-1">
-                    Psychometric Test for Management Trainee Officer
+                    {exam.title}
                   </h2>
                 </div>
                 <div className="flex flex-wrap gap-4 text-xs text-gray-500 mb-6">
@@ -145,7 +191,7 @@ export default function CandidateDashboard() {
                     </svg>
                     Duration:
                     <span className="font-medium text-text-primary">
-                      30 min
+                      {exam.durationPerSlotMinutes} min
                     </span>
                   </span>
                   <span className="flex items-center gap-1 text-text-secondary">
@@ -178,39 +224,20 @@ export default function CandidateDashboard() {
                         strokeLinejoin="round"
                       />
                     </svg>
-                    Question:
-                    <span className="font-medium text-text-primary">5</span>
-                  </span>
-                  <span className="flex items-center gap-1 text-text-secondary">
-                    <svg
-                      width={20}
-                      height={20}
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M10.0001 1.66675C14.6024 1.66675 18.3334 5.39771 18.3334 10.0001C18.3334 14.6025 14.6024 18.3334 10.0001 18.3334C5.39771 18.3334 1.66675 14.6025 1.66675 10.0001M7.42425 2.07247C6.58341 2.34548 5.80121 2.74855 5.10136 3.25792M3.25794 5.10133C2.74846 5.80131 2.34535 6.58368 2.07233 7.42468"
-                        stroke="#9CA3AF"
-                        strokeWidth={1.5}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M12.4995 12.5L7.5 7.5M7.50053 12.5L12.5 7.5"
-                        stroke="#9CA3AF"
-                        strokeWidth={1.5}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    Negative Marking:
-                    <span className="font-medium text-text-primary">-0.25/wrong</span>
+                    Questions:
+                    <span className="font-medium text-text-primary">
+                      {exam.questions.length}
+                    </span>
                   </span>
                 </div>
-                <button className="btn-secondary px-14!">Start</button>
+                <button
+                  onClick={() => handleStartExam(exam.id)}
+                  className="btn-secondary px-14!"
+                >
+                  Start
+                </button>
               </div>
-            </Link>
+            ))}
           </div>
 
           <div className="flex items-center justify-between mt-4">

@@ -27,8 +27,7 @@ const ExamDetailPage = () => {
         <div className="container mx-auto my-14">
           <div className="bg-white rounded-xl border border-border-primary p-6 mb-8">
             <h1 className="text-2xl font-semibold mb-6">Manage Online Test</h1>
-
-            <div className="flex justify-between">
+            <div className="flex flex-col sm:flex-row gap-5 justify-between">
               <div className="flex-1 flex items-center gap-3">
                 {/* Step 1 - Basic Info */}
                 <div className="flex items-center gap-2">

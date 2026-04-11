@@ -30,7 +30,7 @@ body {
 }
 
 .btn-primary{
-  @apply text-white font-semibold px-6 py-3 rounded-xl cursor-pointer transition duration-200;
+  @apply text-white font-semibold px-6 py-3 rounded-xl cursor-pointer transition duration-200 text-center;
   background-color: var(--color-primary);
 }
 .btn-primary:hover{
@@ -38,15 +38,27 @@ body {
 }
 
 .btn-secondary{
-  @apply bg-white text-primary font-semibold text-sm px-6 py-2.5 rounded-xl cursor-pointer transition duration-200 border border-primary;
+  @apply bg-white text-primary font-semibold text-sm px-6 py-2.5 rounded-xl cursor-pointer transition duration-200 border border-primary text-center;
 }
 .btn-secondary:hover{
   @apply bg-primary text-white;
 }
 
 .btn-tertiary{
-  @apply bg-white font-semibold text-sm px-6 py-2.5 rounded-xl cursor-pointer transition duration-200 border border-border-primary;
+  @apply bg-white font-semibold text-sm px-6 py-2.5 rounded-xl cursor-pointer transition duration-200 border border-border-primary text-center;
 }
 .btn-tertiary:hover{
   @apply bg-gray-50;
+}
+
+/* Chrome, Safari, Edge */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
 }

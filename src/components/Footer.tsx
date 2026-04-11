@@ -3,9 +3,9 @@ import Image from "next/image";
 export default function Footer() {
   return (
     <footer className="bg-bg-secondary py-6 px-4">
-      <div className="container mx-auto flex items-center justify-between gap-2">
+      <div className="container mx-auto flex flex-wrap items-center justify-between gap-5">
         <Image src="/footer-logo.png" alt="Logo" width={241} height={32} />
-        <div className="text-white flex items-center gap-4">
+        <div className="text-white flex flex-col md:flex-row md:items-center gap-4">
           <p>Helpline</p>
           <a href="tel:011020202505" className="flex gap-2">
             <svg

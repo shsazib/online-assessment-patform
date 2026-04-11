@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [role, setRole] = useState<"employer" | "candidate">("employer");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // ← New state
+  const [showPassword, setShowPassword] = useState(false);
 
   const login = useAuthStore((state) => state.login);
   const router = useRouter();

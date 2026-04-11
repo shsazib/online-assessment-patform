@@ -1,10 +1,67 @@
+"use client";
+
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useExamStore } from "@/store/useExamStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const TestCompleted = () => {
+  const { currentExam, candidateSession } = useExamStore();
+  const { user } = useAuthStore();
+  const [results, setResults] = useState({ correct: 0, incorrect: 0, skipped: 0 });
+
+  useEffect(() => {
+    if (candidateSession && currentExam) {
+      let correct = 0;
+      let incorrect = 0;
+      let skipped = 0;
+
+      candidateSession.answers.forEach((answer) => {
+        if (answer.isSkipped) {
+          skipped++;
+        } else {
+          const question = currentExam.questions.find(
+            (q) => q.id === answer.questionId
+          );
+          if (!question) return;
+
+          if (question.type === "MCQ") {
+            const selectedOption = question.options.find(
+              (o) => o.id === answer.answer
+            );
+            if (selectedOption?.isCorrect) {
+              correct++;
+            } else {
+              incorrect++;
+            }
+          } else if (question.type === "Checkbox") {
+            const selectedOptions = answer.answer as string[];
+            const correctOptions = question.options
+              .filter((o) => o.isCorrect)
+              .map((o) => o.id);
+
+            if (
+              selectedOptions.length === correctOptions.length &&
+              selectedOptions.every((id) => correctOptions.includes(id))
+            ) {
+              correct++;
+            } else {
+              incorrect++;
+            }
+          } else if (question.type === "Text") {
+            // Text answers are manually graded, mark as answered
+            correct++;
+          }
+        }
+      });
+
+      setResults({ correct, incorrect, skipped });
+    }
+  }, [candidateSession, currentExam]);
+
   return (
     <>
-      <div className="w-full max-w-4xl bg-white rounded-2xl border border-border-primary px-10 py-14 flex flex-col items-center text-center">
+      <div className="w-full max-w-4xl bg-white rounded-2xl border border-border-primary p-5 sm:px-10 sm:py-14 flex flex-col items-center text-center">
         <div className="mb-3">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -26,13 +83,27 @@ const TestCompleted = () => {
           </svg>
         </div>
 
-        <h1 className="text-xl font-semibold mb-3">
-          Test Completed
-        </h1>
+        <h1 className="text-xl font-semibold mb-3">Test Completed</h1>
 
         <p className="text-secondary leading-relaxed mb-8">
-          Congratulations! Md. Naimur Rahman, You have completed your MCQ Exam for Probationary Officer. Thank you for participating.
+          Congratulations! {user?.name}, You have completed your exam for{" "}
+          {currentExam?.title}. Thank you for participating.
         </p>
+
+        <div className="grid sm:grid-cols-3 gap-4 mb-8 w-full">
+          <div className="bg-green-50 rounded-lg p-4">
+            <p className="text-2xl font-bold text-green-600">{results.correct}</p>
+            <p className="text-sm text-green-700">Correct</p>
+          </div>
+          <div className="bg-red-50 rounded-lg p-4">
+            <p className="text-2xl font-bold text-red-600">{results.incorrect}</p>
+            <p className="text-sm text-red-700">Incorrect</p>
+          </div>
+          <div className="bg-yellow-50 rounded-lg p-4">
+            <p className="text-2xl font-bold text-yellow-600">{results.skipped}</p>
+            <p className="text-sm text-yellow-700">Skipped</p>
+          </div>
+        </div>
 
         <Link href="/candidate/dashboard" className="btn-tertiary py-3">
           Back to Dashboard

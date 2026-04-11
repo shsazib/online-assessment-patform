@@ -46,6 +46,7 @@ const BasicInfo = () => {
     if (!formData.questionType) newErrors.questionType = "Question type is required";
     if (!formData.startTime) newErrors.startTime = "Start time is required";
     if (!formData.endTime) newErrors.endTime = "End time is required";
+    if (!formData.duration) newErrors.duration = "Duration is required";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -104,7 +105,7 @@ const BasicInfo = () => {
                 {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Total Candidates <span className="text-red-500">*</span>
@@ -144,7 +145,7 @@ const BasicInfo = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Total Question Set <span className="text-red-500">*</span>
@@ -178,14 +179,12 @@ const BasicInfo = () => {
                   >
                     <option value="">Select question type</option>
                     <option value="MCQ">MCQ</option>
-                    <option value="Checkbox">Checkbox</option>
-                    <option value="Text">Text</option>
                   </select>
                   {errors.questionType && <p className="text-red-500 text-xs mt-1">{errors.questionType}</p>}
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Start Time <span className="text-red-500">*</span>
@@ -228,6 +227,7 @@ const BasicInfo = () => {
                     placeholder="e.g., 30"
                     className="w-full border border-border-primary rounded-lg p-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent transition"
                   />
+                   {errors.duration && <p className="text-red-500 text-xs mt-1">{errors.duration}</p>}
                 </div>
               </div>
             </div>

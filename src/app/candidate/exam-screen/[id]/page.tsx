@@ -1,12 +1,12 @@
 import QuestionAnswer from "@/components/QuestionAnswer";
 import React from "react";
 
-const ExamScreenPage = () => {
+const ExamScreenPage = ({ params }: { params: { id: string } }) => {
   return (
     <>
       <section className="min-h-screen px-4">
         <div className="container mx-auto my-14">
-          <QuestionAnswer />
+          <QuestionAnswer examId={params.id} />
         </div>
       </section>
     </>

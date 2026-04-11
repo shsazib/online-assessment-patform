@@ -26,7 +26,9 @@ interface QuestionsManagementProps {
   examId: string;
 }
 
-const QuestionsManagement: React.FC<QuestionsManagementProps> = ({ examId }) => {
+const QuestionsManagement: React.FC<QuestionsManagementProps> = ({
+  examId,
+}) => {
   const router = useRouter();
   const { exam, loading } = useExamData(examId);
   const { saveExamToStorage } = useExamStore();
@@ -58,7 +60,7 @@ const QuestionsManagement: React.FC<QuestionsManagementProps> = ({ examId }) => 
     let updatedQuestions;
     if (editingQuestion) {
       updatedQuestions = questions.map((q) =>
-        q.id === question.id ? question : q
+        q.id === question.id ? question : q,
       );
     } else {
       updatedQuestions = [
@@ -78,13 +80,15 @@ const QuestionsManagement: React.FC<QuestionsManagementProps> = ({ examId }) => 
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="mb-6">
+      <div className="mb-6 space-y-4">
         <div className="space-y-4">
           {questions.map((question) => (
             <div key={question.id} className="bg-white rounded-2xl p-6">
               {/* Question header */}
               <div className="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-border-primary">
-                <span className="font-semibold">Question {question.number}</span>
+                <span className="font-semibold">
+                  Question {question.number}
+                </span>
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-sm text-text-secondary px-2 py-1 rounded-xl border border-border-primary">
                     {question.type}
@@ -150,13 +154,15 @@ const QuestionsManagement: React.FC<QuestionsManagementProps> = ({ examId }) => 
               {/* Text type answer placeholder */}
               {question.type === "Text" && question.answerPlaceholder && (
                 <div
-                  className="text-sm text-gray-400 italic border border-dashed border-gray-200 rounded-lg p-3 prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{ __html: question.answerPlaceholder }}
+                  className="text-sm"
+                  dangerouslySetInnerHTML={{
+                    __html: question.answerPlaceholder,
+                  }}
                 />
               )}
 
               {/* Actions */}
-              <div className="flex items-center justify-between gap-2 pt-4 mt-4 border-t border-border-primary">
+              <div className="flex items-center justify-between gap-2 pt-4 mt-6 border-t border-border-primary">
                 <button
                   onClick={() => handleEditQuestion(question)}
                   className="text-primary hover:text-primary/80 transition cursor-pointer"
@@ -173,13 +179,11 @@ const QuestionsManagement: React.FC<QuestionsManagementProps> = ({ examId }) => 
             </div>
           ))}
         </div>
-
-        <button
-          onClick={handleAddQuestion}
-          className="w-full mt-6 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-primary hover:text-primary transition font-medium text-sm"
-        >
-          + Add Question
-        </button>
+        <div className="bg-white flex items-center p-6 rounded-2xl">
+          <button onClick={handleAddQuestion} className="btn-primary w-full">
+            Add Question
+          </button>
+        </div>
       </div>
 
       {isModalOpen && (
@@ -192,15 +196,6 @@ const QuestionsManagement: React.FC<QuestionsManagementProps> = ({ examId }) => 
           }}
         />
       )}
-
-      <div className="bg-white flex items-center p-6 rounded-2xl">
-        <button
-          onClick={() => router.back()}
-          className="btn-tertiary text-sm py-2.5"
-        >
-          Back
-        </button>
-      </div>
     </div>
   );
 };

@@ -85,7 +85,7 @@ const BasicInfoView = () => {
             {!isEditing && (
               <button 
                 onClick={() => setIsEditing(true)}
-                className="flex items-center gap-1.5 text-sm font-medium text-purple-600 hover:text-purple-700 transition"
+                className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition cursor-pointer"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -223,7 +223,7 @@ const BasicInfoView = () => {
                 </p>
               </div>
 
-              <div className="grid grid-cols-4 gap-4 mb-5">
+              <div className="grid sm:grid-cols-4 gap-4 mb-5">
                 <div>
                   <p className="text-xs text-gray-500 mb-0.5">Total Candidates</p>
                   <p className="text-sm font-semibold text-gray-900">
@@ -260,7 +260,7 @@ const BasicInfoView = () => {
             </>
           )}
         </div>
-        <div className="bg-white flex items-center justify-between mt-6 p-6 rounded-2xl">
+        <div className="bg-white flex flex-wrap gap-2 items-center justify-between mt-6 p-6 rounded-2xl">
           <button 
             onClick={() => router.back()}
             className="btn-tertiary text-sm py-2.5"
@@ -271,7 +271,7 @@ const BasicInfoView = () => {
             onClick={handleContinue}
             className="btn-primary text-sm py-2.5"
           >
-            Save & Continue to Questions
+            Continue to Questions
           </button>
         </div>
       </div>
