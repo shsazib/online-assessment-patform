@@ -3,7 +3,6 @@
 import { useExamStore } from "@/store/useExamStore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
-import { Question } from "@/store/useExamStore";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 

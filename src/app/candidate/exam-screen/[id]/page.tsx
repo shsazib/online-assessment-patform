@@ -1,5 +1,5 @@
-import QuestionAnswer from "@/components/QuestionAnswer";
 import React from "react";
+import QuestionAnswer from "@/components/QuestionAnswer";
 
 const ExamScreenPage = ({ params }: { params: { id: string } }) => {
   return (

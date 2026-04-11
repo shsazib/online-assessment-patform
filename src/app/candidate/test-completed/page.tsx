@@ -1,5 +1,5 @@
-import TestCompleted from "@/components/TestCompleted";
 import React from "react";
+import TestCompleted from "@/components/TestCompleted";
 
 const TestCompletedPage = () => {
   return (

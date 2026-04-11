@@ -11,7 +11,6 @@ export default function CandidateDashboard() {
   const { startCandidateSession, setCurrentExam, loadExamsFromStorage } = useExamStore();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [allExams, setAllExams] = useState<any[]>(exams);
 
   useEffect(() => {
@@ -24,7 +23,6 @@ export default function CandidateDashboard() {
     if (typeof window !== "undefined") {
       try {
         const storedExams = loadExamsFromStorage();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const combined: any[] = [...exams];
 
         storedExams.forEach((storedExam) => {

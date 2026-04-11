@@ -2,7 +2,6 @@
 
 import { useAuthStore } from "@/store/useAuthStore";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 

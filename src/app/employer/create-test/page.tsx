@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import BasicInfoForm from "@/components/BasicInfoForm";
 import Link from "next/link";
