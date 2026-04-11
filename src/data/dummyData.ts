@@ -42,7 +42,34 @@ const dummyData = {
                     "points": 5,
                     "text": "Write a brief of your capital city",
                     "options": [],
-                    "answerPlaceholder": "Write your answer here..."
+                    "answerPlaceholder": "Write your answer here...",
+                    "correctAnswer": "Dhaka"
+                },
+                {
+                    "id": "q_004",
+                    "number": 4,
+                    "type": "MCQ",
+                    "points": 1,
+                    "text": "In which year did Bangladesh gain independence?",
+                    "options": [
+                        { "id": "opt_a", "label": "A", "text": "1969", "isCorrect": false },
+                        { "id": "opt_b", "label": "B", "text": "1971", "isCorrect": true },
+                        { "id": "opt_c", "label": "C", "text": "1973", "isCorrect": false },
+                        { "id": "opt_d", "label": "D", "text": "1975", "isCorrect": false }
+                    ]
+                },
+                {
+                    "id": "q_005",
+                    "number": 5,
+                    "type": "Checkbox",
+                    "points": 2,
+                    "text": "Which of these cities are in Bangladesh?",
+                    "options": [
+                        { "id": "opt_a", "label": "A", "text": "Sylhet", "isCorrect": true },
+                        { "id": "opt_b", "label": "B", "text": "Kolkata", "isCorrect": false },
+                        { "id": "opt_c", "label": "C", "text": "Khulna", "isCorrect": true },
+                        { "id": "opt_d", "label": "D", "text": "Mumbai", "isCorrect": false }
+                    ]
                 }
             ]
         },
@@ -65,7 +92,7 @@ const dummyData = {
                         { "id": "opt_a", "label": "A", "text": "Sheikh Mujibur Rahman", "isCorrect": true },
                         { "id": "opt_b", "label": "B", "text": "Ziaur Rahman", "isCorrect": false },
                         { "id": "opt_c", "label": "C", "text": "A.K. Fazlul Huq", "isCorrect": false },
-                        { "id": "opt_d", "label": "D", "text": "Hussain Muhammad Ershad", "isCorrect": false }
+                        { "id": "opt_d", "label": "D", "text": "H.M. Ershad", "isCorrect": false }
                     ]
                 },
                 {
@@ -88,7 +115,34 @@ const dummyData = {
                     "points": 5,
                     "text": "Describe the significance of the Language Movement of 1952.",
                     "options": [],
-                    "answerPlaceholder": "Write your answer here..."
+                    "answerPlaceholder": "Write your answer here...",
+                    "correctAnswer": "Liberation"
+                },
+                {
+                    "id": "q_004",
+                    "number": 4,
+                    "type": "MCQ",
+                    "points": 1,
+                    "text": "In which city was the Language Movement of 1952 centred?",
+                    "options": [
+                        { "id": "opt_a", "label": "A", "text": "Chittagong", "isCorrect": false },
+                        { "id": "opt_b", "label": "B", "text": "Rajshahi", "isCorrect": false },
+                        { "id": "opt_c", "label": "C", "text": "Dhaka", "isCorrect": true },
+                        { "id": "opt_d", "label": "D", "text": "Sylhet", "isCorrect": false }
+                    ]
+                },
+                {
+                    "id": "q_005",
+                    "number": 5,
+                    "type": "MCQ",
+                    "points": 1,
+                    "text": "What is the national anthem of Bangladesh?",
+                    "options": [
+                        { "id": "opt_a", "label": "A", "text": "Amar Sonar Bangla", "isCorrect": true },
+                        { "id": "opt_b", "label": "B", "text": "Joy Bangla", "isCorrect": false },
+                        { "id": "opt_c", "label": "C", "text": "Ekusher Gaan", "isCorrect": false },
+                        { "id": "opt_d", "label": "D", "text": "Notuner Gaan", "isCorrect": false }
+                    ]
                 }
             ]
         },
@@ -134,7 +188,34 @@ const dummyData = {
                     "points": 5,
                     "text": "Explain the concept of data normalization in databases.",
                     "options": [],
-                    "answerPlaceholder": "Write your answer here..."
+                    "answerPlaceholder": "Write your answer here...",
+                    "correctAnswer": "Normalization"
+                },
+                {
+                    "id": "q_004",
+                    "number": 4,
+                    "type": "MCQ",
+                    "points": 1,
+                    "text": "What is 15% of 200?",
+                    "options": [
+                        { "id": "opt_a", "label": "A", "text": "25", "isCorrect": false },
+                        { "id": "opt_b", "label": "B", "text": "30", "isCorrect": true },
+                        { "id": "opt_c", "label": "C", "text": "35", "isCorrect": false },
+                        { "id": "opt_d", "label": "D", "text": "40", "isCorrect": false }
+                    ]
+                },
+                {
+                    "id": "q_005",
+                    "number": 5,
+                    "type": "Checkbox",
+                    "points": 2,
+                    "text": "Which of these are sorting algorithms?",
+                    "options": [
+                        { "id": "opt_a", "label": "A", "text": "Bubble Sort", "isCorrect": true },
+                        { "id": "opt_b", "label": "B", "text": "Binary Tree", "isCorrect": false },
+                        { "id": "opt_c", "label": "C", "text": "Merge Sort", "isCorrect": true },
+                        { "id": "opt_d", "label": "D", "text": "Hash Map", "isCorrect": false }
+                    ]
                 }
             ]
         }
